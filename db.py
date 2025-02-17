@@ -38,6 +38,26 @@ def create_books_table():
     connection.close()
 
 
+
+# Table Create
+def create_users_table():
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute(f"USE {settings.DB_NAME}")
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL
+        )
+    """)
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+
 def insert_book(title, author, pages, published_year):
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -52,6 +72,39 @@ def insert_book(title, author, pages, published_year):
     connection.close()
 
 
+
+
+def insert_user(username, email, password):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute(f"USE {settings.DB_NAME}")
+    cursor.execute("""
+        INSERT INTO users (username, email, password)
+        VALUES (%s, %s, %s)
+    """, (username, email, password))
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+
+def get_user(email, hashed_password):
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    cursor.execute(f"USE {settings.DB_NAME}")
+    cursor.execute("""
+        SELECT * FROM users 
+        WHERE email = %s AND password = %s
+    """, (email, hashed_password))
+
+    user = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return user
+
+
 def get_books():
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -64,4 +117,3 @@ def get_books():
     connection.close()
 
     return books
-    
